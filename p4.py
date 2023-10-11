@@ -66,8 +66,8 @@ def serializing_model():
     net = cv2.dnn.readNetFromCaffe(prototxt_path, model_path)
     return net
 net = serializing_model()
+
 def detect_objects(frame):
-    
 
     if frame is not None and not frame.size == (0, 0):
         blob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)),
@@ -262,6 +262,9 @@ def sliding_window(img, nwindows=9, margin=150, minpix = 1, draw_windows=True):
     rightx = nonzerox[right_lane_inds]
     righty = nonzeroy[right_lane_inds]
 
+    print("Number of left lane pixels:", len(rightx))
+    print("Number of left lane indices:", len(right_lane_inds))
+
     # Fit a second order polynomial to each
     left_fit = np.polyfit(lefty, leftx, 2)
     right_fit = np.polyfit(righty, rightx, 2)
@@ -383,8 +386,10 @@ def process_video(input_video_path, output_video_path):
             continue
 
         # Process the frame using the vid_pipeline function
+        # frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
         frame = cv2.resize(frame, (1280, 720))
         processed_frame = vid_pipeline(frame)
+        # processed_frame = colorit(processed_frame)
 
         # Write the processed frame to the output video
         # out.write(processed_frame[0])
@@ -401,4 +406,4 @@ def process_video(input_video_path, output_video_path):
 
     cv2.destroyAllWindows()
 
-process_video('testvideos/harder_challenge_video.mp4', 'newvideo.mp4')
+process_video('testvideos/trynew1.mp4', 'newvideo.mp4')
