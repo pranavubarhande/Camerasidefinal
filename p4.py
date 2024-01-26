@@ -388,7 +388,8 @@ def process_video(input_video_path, output_video_path):
         # Process the frame using the vid_pipeline function
         # frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
         frame = cv2.resize(frame, (1280, 720))
-        processed_frame = vid_pipeline(frame)
+        # processed_frame = vid_pipeline(frame)
+        processed_frame = detect_objects(frame)
         # processed_frame = colorit(processed_frame)
 
         # Write the processed frame to the output video
@@ -406,4 +407,4 @@ def process_video(input_video_path, output_video_path):
 
     cv2.destroyAllWindows()
 
-process_video('testvideos/trynew1.mp4', 'newvideo.mp4')
+process_video('testvideos/trynew13.mp4', 'newvideo.mp4')
