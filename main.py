@@ -1,7 +1,7 @@
 import cv2
 import tkinter as tk
 from PIL import Image, ImageTk
-from object_detection import object_detection_pipeline, load_object_detection_model
+from object_detection import object_detection_pipeline, load_object_detection_model, load_lane_detection_model, road_lines
 
 class VideoApp:
     def __init__(self, window, window_title, input_video_path, output_video_path):
@@ -10,6 +10,7 @@ class VideoApp:
 
         # Load the object detection model
         self.model = load_object_detection_model()
+        self.lanemodel = load_lane_detection_model()
 
         self.video_source = cv2.VideoCapture(input_video_path)
         self.out = cv2.VideoWriter(output_video_path, cv2.VideoWriter_fourcc(*'XVID'), int(self.video_source.get(5)), (int(self.video_source.get(3)), int(self.video_source.get(4))))
@@ -27,6 +28,8 @@ class VideoApp:
         ret, frame = self.video_source.read()
         if ret:
             processed_frame = object_detection_pipeline(frame, self.model)
+            processed_frame = cv2.resize(processed_frame, (1280, 720))
+            processed_frame = road_lines(processed_frame, self.lanemodel)
             self.photo = self.convert_to_tk_image(processed_frame)
             self.canvas.create_image(0, 0, anchor=tk.NW, image=self.photo)
             self.out.write(processed_frame)

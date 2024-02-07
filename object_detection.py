@@ -1,12 +1,30 @@
 import cv2
 import numpy as np
+from moviepy.editor import VideoFileClip
+import tensorflow as tf
+from tensorflow import keras
 
+class Lanes():
+    def __init__(self):
+        self.recent_fit = []
+        self.avg_fit = []
+
+CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
+    "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
+    "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
+    "sofa", "train", "tvmonitor"]
+COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
+lanes = Lanes()
 # Load your pre-trained model
 def load_object_detection_model():
     prototxt_path = "MobileNetSSD_deploy.prototxt"
     model_path = "MobileNetSSD_deploy.caffemodel"
     net = cv2.dnn.readNetFromCaffe(prototxt_path, model_path)
     return net
+
+def load_lane_detection_model():
+    lanemodel = keras.models.load_model('model.h5')
+    return lanemodel
 
 # Object detection pipeline
 def object_detection_pipeline(frame, model):
@@ -37,3 +55,31 @@ def object_detection_pipeline(frame, model):
                 cv2.putText(frame, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
     return frame
+
+def road_lines(image, model):
+    small_img = cv2.resize(image, (160, 80))  # Resize image using OpenCV
+    small_img = np.array(small_img)
+    small_img = small_img[None,:,:,:]
+
+    prediction = model.predict(small_img)[0] * 255
+
+    lanes.recent_fit.append(prediction)
+   
+    if len(lanes.recent_fit) > 5:
+        lanes.recent_fit = lanes.recent_fit[1:]
+
+    lanes.avg_fit = np.mean(np.array([i for i in lanes.recent_fit]), axis=0)
+    
+    blanks = np.zeros_like(lanes.avg_fit).astype(np.uint8)
+    lane_drawn = np.dstack((blanks, lanes.avg_fit, blanks))
+
+    lane_image = cv2.resize(lane_drawn, (1280, 720))  # Resize the lane image
+
+    # Convert both images to np.uint8
+    image = image.astype(np.uint8)
+    lane_image = lane_image.astype(np.uint8)
+
+    # Apply addWeighted with output data type specified as np.uint8
+    result = cv2.addWeighted(image, 1, lane_image, 1, 0, dtype=cv2.CV_8U)
+
+    return result
