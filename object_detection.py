@@ -45,7 +45,7 @@ def object_detection_pipeline(frame, model):
                 (startX, startY, endX, endY) = box.astype("int")
 
                 # Print label, confidence, and coordinates
-                label = "Class: {}, Confidence: {:.2f}%".format(idx, confidence * 100)
+                label = "Class: {}, Confidence: {:.2f}%".format(CLASSES[idx], confidence * 100)
                 coordinates = "Coordinates: ({}, {}, {}, {})".format(startX, startY, endX, endY)
                 # print(label, coordinates)
 

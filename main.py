@@ -15,11 +15,12 @@ class VideoApp:
         self.video_source = cv2.VideoCapture(input_video_path)
         self.out = cv2.VideoWriter(output_video_path, cv2.VideoWriter_fourcc(*'XVID'), int(self.video_source.get(5)), (int(self.video_source.get(3)), int(self.video_source.get(4))))
 
-        self.canvas = tk.Canvas(window, width=self.video_source.get(3), height=self.video_source.get(4))
+        self.canvas = tk.Canvas(window, width=1280, height=680)
         self.canvas.pack()
 
         self.btn_quit = tk.Button(window, text="Quit", width=10, command=self.on_quit)
         self.btn_quit.pack(padx=20, pady=10)
+        self.canvas.create_text(700, 360, text="My name is Pranav", font=("Helvetica", 24), fill="white")
 
         self.update()
         self.window.mainloop()
